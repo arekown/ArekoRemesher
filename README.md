@@ -4,6 +4,8 @@
 
 ArekoRemesher is a Blender extension that turns a mesh (triangles, scans, sculpts, boolean or CAD results) into a clean quad mesh, right from the sidebar tab **Areko**.
 
+[![Demo: a triangle mesh is selected, Create Quads is clicked, the quad mesh appears and turns](docs/media/demo_en.gif)](docs/media/demo_en.mp4)
+
 ![Input made of triangles (left) and the quad mesh made from it (right)](docs/images/before_after_suzanne.png)
 
 ## Requirements

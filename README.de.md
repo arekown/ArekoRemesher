@@ -4,6 +4,8 @@
 
 ArekoRemesher ist eine Blender-Erweiterung, die aus einem Netz (Dreiecke, Scans, Skulpturen, Boolean- oder CAD-Ergebnisse) ein sauberes Vierecksnetz macht, direkt aus dem Reiter **Areko** der Seitenleiste.
 
+[![Vorführung: Ein Dreiecksnetz wird ausgewählt, „Quads erzeugen“ geklickt, das Vierecksnetz erscheint und dreht sich](docs/media/demo_de.gif)](docs/media/demo_de.mp4)
+
 ![Eingabe aus Dreiecken (links) und das daraus erzeugte Vierecksnetz (rechts)](docs/images/before_after_suzanne.png)
 
 ## Voraussetzungen
