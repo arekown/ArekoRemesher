@@ -9,23 +9,36 @@ ArekoRemesher ist eine Blender-Erweiterung, die aus einem Netz (Dreiecke, Scans,
 ## Voraussetzungen
 
 - **Blender 5.2 oder neuer** (`blender_version_min = "5.2.0"` in `blender_manifest.toml`).
-- **Nur Linux, x86-64.** Das Paket enthält den übersetzten Kern `lib/libarekoremesher.so` und gibt die Plattform `linux-x64` an; für Windows und macOS gibt es keinen Bau.
-- Die Kernbibliothek braucht **glibc 2.32 oder neuer** und die **libstdc++ von GCC 13 oder neuer**. Sie wird im Freedesktop-SDK 25.08 gebaut, der Laufzeit des Blender-Flatpaks, und wurde mit dem Blender-5.2-Flatpak getestet.
+- **Ein Paket je System.** Jede ZIP enthält nur den übersetzten Kern für ihr System und gibt nur dessen Plattformen an:
+
+  | System | Paket | Kernbibliothek |
+  |---|---|---|
+  | Linux x86-64 | `areko_remesher-0.1.0-linux-x64.zip` | `lib/libarekoremesher.so` |
+  | Windows x86-64 | `areko_remesher-0.1.0-windows-x64.zip` | `lib/arekoremesher.dll` |
+  | macOS 11.2 oder neuer, Apple Silicon und Intel | `areko_remesher-0.1.0-macos.zip` | `lib/libarekoremesher.dylib` (Universal, arm64 und x86_64) |
+
+- Unter Linux braucht die Kernbibliothek **glibc 2.32 oder neuer** und die **libstdc++ von GCC 13 oder neuer**. Sie wird im Freedesktop-SDK 25.08 gebaut, der Laufzeit des Blender-Flatpaks, und wurde mit dem Blender-5.2-Flatpak getestet.
+- Unter Windows ist die C++-Laufzeit in die DLL eingebunden; zusätzliche Laufzeit-DLLs sind nicht nötig.
 - Keine zusätzlichen Python-Pakete: Die Erweiterung nutzt nur, was Blender mitbringt (`numpy`, `ctypes`).
+
+> **Windows und macOS:** Diese Pakete werden automatisch gebaut und bestehen dasselbe Prüfprogramm wie der Linux-Bau, wurden aber noch nicht in Blender unter Windows oder macOS ausprobiert. Dort arbeiten andere Compiler und Mathematik-Bibliotheken, deshalb können die Ergebnisse im Detail leicht von Linux abweichen; die Qualität ist dieselbe. Rückmeldungen sind willkommen.
 
 ## Paket bauen
 
-`werkzeuge/bauen.sh` baut den Kern im `org.freedesktop.Sdk//25.08` (Flatpak), lässt das Prüfprogramm laufen und packt die Erweiterung mit Blenders eigenem Erweiterungs-Bauwerkzeug (Flatpak `org.blender.Blender`). Das Ergebnis ist `dist/areko_remesher-0.1.0.zip`.
+`werkzeuge/bauen.sh` baut den Kern im `org.freedesktop.Sdk//25.08` (Flatpak), lässt das Prüfprogramm laufen und packt die Erweiterung mit Blenders eigenem Erweiterungs-Bauwerkzeug (Flatpak `org.blender.Blender`). Das Ergebnis ist `dist/areko_remesher-0.1.0-linux-x64.zip`.
+
+Die Bibliotheken für Windows und macOS baut GitHub Actions (`.github/workflows/kern.yml`) und lässt dort auf beiden Systemen ebenfalls das Prüfprogramm laufen. `werkzeuge/bauen.sh --other-platforms` lädt sie aus dem letzten erfolgreichen Lauf für den aktuellen Commit herunter und packt `dist/areko_remesher-0.1.0-windows-x64.zip` und `dist/areko_remesher-0.1.0-macos.zip`.
 
 ```sh
 werkzeuge/bauen.sh
+werkzeuge/bauen.sh --other-platforms
 ```
 
 ## Installation
 
 1. In Blender **Bearbeiten › Einstellungen… › Get Extensions** öffnen.
 2. Oben rechts das kleine Pfeilmenü öffnen und **Install from Disk…** wählen (dieser Punkt ist in Blender nicht übersetzt).
-3. `areko_remesher-0.1.0.zip` auswählen.
+3. Die ZIP für das eigene System auswählen (siehe *Voraussetzungen*), zum Beispiel `areko_remesher-0.1.0-linux-x64.zip`.
 4. Im 3D-Ansichtsfenster **N** drücken, um die Seitenleiste zu öffnen, und den Reiter **Areko** anklicken. Oben stehen das runde Areko-Logo, die Version und **Kern bereit**.
 
 ## Erster Lauf
