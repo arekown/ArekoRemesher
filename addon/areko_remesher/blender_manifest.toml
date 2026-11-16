@@ -1,0 +1,15 @@
+schema_version = "1.0.0"
+
+id = "areko_remesher"
+version = "0.1.0"
+name = "ArekoRemesher"
+tagline = "Clean quad topology from any mesh, in the sidebar tab Areko"
+maintainer = "arekown"
+type = "add-on"
+
+blender_version_min = "5.2.0"
+license = ["SPDX:GPL-3.0-or-later"]
+platforms = ["linux-x64"]
+
+[build]
+paths_exclude_pattern = ["__pycache__/", "*.pyc"]

@@ -1,0 +1,5 @@
+/* Only the C interface leaves the shared library. */
+{
+    global: arm_*;
+    local: *;
+};
