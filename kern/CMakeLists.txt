@@ -217,15 +217,22 @@ find_package(Threads REQUIRED)
 add_library(arekoremesher SHARED $<TARGET_OBJECTS:arekoremesher_objekte> $<TARGET_OBJECTS:arm_tess>)
 target_include_directories(arekoremesher PUBLIC include)
 target_link_libraries(arekoremesher PRIVATE Threads::Threads)
-target_link_options(arekoremesher PRIVATE -Wl,--no-undefined -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/exports.map)
-set_target_properties(arekoremesher PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/exports.map)
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_options(arekoremesher PRIVATE -Wl,--no-undefined -Wl,--version-script=${CMAKE_CURRENT_SOURCE_DIR}/exports.map)
+    set_target_properties(arekoremesher PROPERTIES LINK_DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/exports.map)
+endif()
 
 # Static library (PIC) for hosts that link the core into their own module.
 add_library(arekoremesher_statisch STATIC $<TARGET_OBJECTS:arekoremesher_objekte> $<TARGET_OBJECTS:arm_tess>)
 target_include_directories(arekoremesher_statisch PUBLIC include)
 target_compile_definitions(arekoremesher_statisch INTERFACE ARM_STATIC)
 target_link_libraries(arekoremesher_statisch INTERFACE Threads::Threads)
-set_target_properties(arekoremesher_statisch PROPERTIES OUTPUT_NAME arekoremesher)
+if(MSVC)
+    # arekoremesher.lib is the import library of the DLL.
+    set_target_properties(arekoremesher_statisch PROPERTIES OUTPUT_NAME arekoremesher_static)
+else()
+    set_target_properties(arekoremesher_statisch PROPERTIES OUTPUT_NAME arekoremesher)
+endif()
 
 # Check program for the core logic (run by werkzeuge/bauen.sh after each build).
 add_executable(arekoremesher_pruefung pruefung/pruefung.cpp $<TARGET_OBJECTS:arekoremesher_objekte> $<TARGET_OBJECTS:arm_tess>)

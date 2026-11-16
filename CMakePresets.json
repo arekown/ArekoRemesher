@@ -35,6 +35,25 @@
         "CMAKE_AR": "$env{ARM_CLANG_ROOT}/bin/llvm-ar",
         "CMAKE_RANLIB": "$env{ARM_CLANG_ROOT}/bin/llvm-ranlib"
       }
+    },
+    {
+      "name": "windows",
+      "displayName": "MSVC x64, static runtime (GitHub Actions)",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "architecture": {
+        "value": "x64",
+        "strategy": "set"
+      }
+    },
+    {
+      "name": "macos",
+      "inherits": "basis",
+      "displayName": "Apple Clang, universal arm64 + x86_64 (GitHub Actions)",
+      "generator": "Unix Makefiles",
+      "cacheVariables": {
+        "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "11.2"
+      }
     }
   ],
   "buildPresets": [
@@ -45,6 +64,16 @@
     {
       "name": "clang-libcxx",
       "configurePreset": "clang-libcxx"
+    },
+    {
+      "name": "windows",
+      "configurePreset": "windows",
+      "configuration": "Release"
+    },
+    {
+      "name": "macos",
+      "configurePreset": "macos",
+      "jobs": 4
     }
   ]
 }

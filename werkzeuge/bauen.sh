@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
-# Builds the core and packages the Blender extension.
+# Builds the core and packages the Blender extension, one .zip per platform.
 #   werkzeuge/bauen.sh                 build in org.freedesktop.Sdk//25.08 (matches Blender's runtime), run the check program,
-#                                      copy the .so into the add-on, build the extension .zip into dist/
+#                                      copy the .so into the add-on, build dist/areko_remesher-<version>-linux-x64.zip
+#   werkzeuge/bauen.sh --other-platforms [run-id]
+#                                      download the Windows and macOS libraries built by GitHub Actions
+#                                      (.github/workflows/kern.yml; default: the latest successful run for HEAD)
+#                                      and build dist/areko_remesher-<version>-windows-x64.zip and -macos.zip
 #   werkzeuge/bauen.sh --clang-libcxx  portability check: Clang + libc++ on the host (no packaging); the
 #                                      toolchain root comes from ARM_CLANG_ROOT or from werkzeuge/lokal.sh
 set -euo pipefail
@@ -38,10 +42,42 @@ build_sdk() {
     mv -f "$ADDON/lib/.libarekoremesher.so.neu" "$ADDON/lib/libarekoremesher.so"
 }
 
-package_extension() {
+# package_platform <suffix> <platforms as TOML list> <library file>
+# Copies the add-on into build/paket/<suffix>, keeps only the given library in
+# lib/ and only the given platforms in the manifest, then builds the .zip.
+package_platform() {
+    local suffix="$1" platforms="$2" library="$3"
+    local stage="$REPO/build/paket/$suffix/areko_remesher"
+    rm -rf "$REPO/build/paket/$suffix"
+    mkdir -p "$stage"
+    cp -r "$ADDON/." "$stage/"
+    rm -rf "$stage/lib"
+    mkdir "$stage/lib"
+    cp "$library" "$stage/lib/"
+    sed -i "s/^platforms = .*/platforms = $platforms/" "$stage/blender_manifest.toml"
+    grep -qxF "platforms = $platforms" "$stage/blender_manifest.toml"
     mkdir -p "$REPO/dist"
     flatpak run --command=blender org.blender.Blender --factory-startup \
-        --command extension build --source-dir "$ADDON" --output-dir "$REPO/dist"
+        --command extension build --source-dir "$stage" \
+        --output-filepath "$REPO/dist/areko_remesher-$(manifest_version)-$suffix.zip"
+}
+
+package_other_platforms() {
+    local run="${1:-}"
+    if [[ -z "$run" ]]; then
+        run="$(cd "$REPO" && gh run list --workflow kern.yml --commit "$(git rev-parse HEAD)" \
+            --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+        if [[ -z "$run" ]]; then
+            echo "no successful run of kern.yml for HEAD" >&2
+            exit 1
+        fi
+    fi
+    local artifacts="$REPO/build/artefakte"
+    rm -rf "$artifacts"
+    mkdir -p "$artifacts"
+    (cd "$REPO" && gh run download "$run" --dir "$artifacts")
+    package_platform windows-x64 '["windows-x64"]' "$artifacts/arekoremesher-windows-x64/arekoremesher.dll"
+    package_platform macos '["macos-arm64", "macos-x64"]' "$artifacts/arekoremesher-macos-universal/libarekoremesher.dylib"
 }
 
 build_clang_libcxx() {
@@ -61,13 +97,17 @@ case "${1:-}" in
     "")
         check_versions
         build_sdk
-        package_extension
+        package_platform linux-x64 '["linux-x64"]' "$ADDON/lib/libarekoremesher.so"
+        ;;
+    --other-platforms)
+        check_versions
+        package_other_platforms "${2:-}"
         ;;
     --clang-libcxx)
         build_clang_libcxx
         ;;
     *)
-        echo "usage: $0 [--clang-libcxx]" >&2
+        echo "usage: $0 [--clang-libcxx | --other-platforms [run-id]]" >&2
         exit 2
         ;;
 esac

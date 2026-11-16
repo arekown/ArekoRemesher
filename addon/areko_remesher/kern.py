@@ -1,9 +1,10 @@
-# Binding of the core library (libarekoremesher.so) via ctypes.
+# Binding of the core library (libarekoremesher.so / arekoremesher.dll / libarekoremesher.dylib) via ctypes.
 # All C signatures are declared in one place (CoreLibrary._declare).
 
 from __future__ import annotations
 
 import ctypes
+import sys
 import threading
 import traceback
 from contextlib import contextmanager
@@ -200,7 +201,12 @@ class StageData:
 class CoreLibrary:
     """Loaded core library with typed entry points."""
 
-    FILE_NAME = "libarekoremesher.so"
+    if sys.platform == "win32":
+        FILE_NAME = "arekoremesher.dll"
+    elif sys.platform == "darwin":
+        FILE_NAME = "libarekoremesher.dylib"
+    else:
+        FILE_NAME = "libarekoremesher.so"
     SUPPORTED_MAJOR = 0
 
     def __init__(self, path: Path):

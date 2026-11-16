@@ -23,6 +23,8 @@
 
 #if defined(ARM_STATIC)
 #define ARM_API
+#elif defined(_WIN32)
+#define ARM_API __declspec(dllexport)
 #elif defined(__GNUC__) || defined(__clang__)
 #define ARM_API __attribute__((visibility("default")))
 #else

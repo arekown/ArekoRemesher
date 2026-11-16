@@ -1,0 +1,52 @@
+# Builds the core for Windows and macOS, runs the check program and keeps the
+# library as an artifact. The Linux library is built locally (werkzeuge/bauen.sh).
+name: Kern
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  windows:
+    name: Windows x64 (MSVC)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Configure
+        run: cmake --preset windows
+      - name: Build
+        run: cmake --build --preset windows
+      - name: Check program
+        run: ./build/windows/kern/Release/arekoremesher_pruefung.exe
+      - uses: actions/upload-artifact@v7
+        with:
+          name: arekoremesher-windows-x64
+          path: build/windows/kern/Release/arekoremesher.dll
+          if-no-files-found: error
+
+  macos:
+    name: macOS universal (arm64 + x86_64)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Configure
+        run: cmake --preset macos
+      - name: Build
+        run: cmake --build --preset macos
+      - name: Architectures
+        run: |
+          lipo -info build/macos/kern/libarekoremesher.dylib
+          otool -l build/macos/kern/libarekoremesher.dylib | grep -A4 -E "LC_BUILD_VERSION|LC_VERSION_MIN_MACOSX" | grep -E "minos|version"
+      - name: Check program (arm64)
+        run: arch -arm64 build/macos/kern/arekoremesher_pruefung
+      - name: Check program (x86_64, Rosetta)
+        run: arch -x86_64 build/macos/kern/arekoremesher_pruefung
+      - uses: actions/upload-artifact@v7
+        with:
+          name: arekoremesher-macos-universal
+          path: build/macos/kern/libarekoremesher.dylib
+          if-no-files-found: error
