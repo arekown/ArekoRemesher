@@ -156,3 +156,9 @@ Leave **Detect Creases** on and adjust **Crease Angle**: lower it so that softer
 ### Looking inside
 
 Under **Insight**, **Stage** shows one stage of the computation as an object of its own, for example *Feature Lines* (which creases were found) or *Size Field* (where the quads get small). While a stage is shown, changed settings update it after a moment. **Close Stage** brings the input back.
+
+## License
+
+ArekoRemesher is licensed under the **GNU General Public License v3.0 or later** (see [LICENSE](LICENSE)), as Blender requires for extensions that use its Python API.
+
+The core includes third-party code under its own licenses: [Eigen](https://eigen.tuxfamily.org) and [CDT](https://github.com/artem-ogre/CDT) (both MPL 2.0) and the polygon tessellator of [GLU](https://archive.mesa3d.org/glu/) (SGI Free Software License B 2.0). The license files are in `fremd/`, and every package contains them in `THIRD-PARTY-NOTICES.txt`.

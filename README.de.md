@@ -156,3 +156,9 @@ Neben jeder Einstellung und jedem Knopf im Reiter steht ein **?**. Mit der Maus 
 ### Hineinschauen
 
 Unter **Einblick** zeigt **Stufe** eine Stufe der Rechnung als eigenes Objekt, zum Beispiel *Merkmalslinien* (welche Knicke gefunden wurden) oder *Größenfeld* (wo die Vierecke klein werden). Solange eine Stufe gezeigt wird, frischen geänderte Einstellungen sie nach einem Moment auf. **Stufe schließen** holt die Eingabe zurück.
+
+## Lizenz
+
+ArekoRemesher steht unter der **GNU General Public License v3.0 oder neuer** (siehe [LICENSE](LICENSE)), wie Blender es für Erweiterungen verlangt, die seine Python-Schnittstelle nutzen.
+
+Der Kern enthält fremden Code unter dessen eigenen Lizenzen: [Eigen](https://eigen.tuxfamily.org) und [CDT](https://github.com/artem-ogre/CDT) (beide MPL 2.0) sowie den Polygon-Tessellator von [GLU](https://archive.mesa3d.org/glu/) (SGI Free Software License B 2.0). Die Lizenzdateien liegen in `fremd/`, und jedes Paket enthält sie in `THIRD-PARTY-NOTICES.txt`.
